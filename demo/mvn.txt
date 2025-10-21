@@ -1,0 +1,2 @@
+mvn cleanでmvnした情報を削除
+mvn packageでjarファイルの作成
