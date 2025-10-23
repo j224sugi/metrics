@@ -23,9 +23,9 @@ class Main{
     public static void main(String[] args) throws IOException {
         Main main=new Main();
 
-        String strRootProject="C:/Users/syuuj/jsoup/src/main/java";
+        String strRootProject="C:/Users/sugii syuji/metrics/demo/jsoup/src/main/java";
         Path rootProject=Paths.get(strRootProject);        
-        config=Main.set_SymbolSolver(rootProject);
+        config=Main.setSymbolSolver(rootProject);
 
         main.getJavaFiles(rootProject);
     }
@@ -35,7 +35,7 @@ class Main{
         try (Stream<Path> paths=Files.walk(root)){
             units=paths.filter(p->p.toString().endsWith(".java")).map(Main::parse).collect(Collectors.toList());
             for(CompilationUnit unit:units){
-                unit.accept(new MyVoidVisitor(),unit.getPackageDeclaration().get().toString());
+                unit.accept(new NOMVisitor(),unit.getPackageDeclaration().get().toString());
             }
         } catch (IOException e) {
             e.printStackTrace(System.err);
@@ -58,7 +58,7 @@ class Main{
         }
     }
 
-    private static ParserConfiguration set_SymbolSolver(Path path) throws IOException{                  //parseの設定
+    private static ParserConfiguration setSymbolSolver(Path path) throws IOException{                  //parseの設定
         CombinedTypeSolver combinedSolver=new CombinedTypeSolver();
         combinedSolver.add(new ReflectionTypeSolver());                                                //標準ライブラリの名前解決
         //combinedSolver.add(new JarTypeSolver(path));

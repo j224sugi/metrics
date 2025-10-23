@@ -1,0 +1,47 @@
+Main.java{
+    set_SymbolSolver()
+    combinedSolver.add(new ReflectionTypeSolver)⇒標準ライブラリの名前解決設定
+    combinedSolver.add(new JavaParserTypeSolver(path))⇒ソースコード内の全ファイルに関する名前解決 src/java(?)まで設定する必要がある プロジェクト名までだと名前解決できない
+    ParserConfigurationでJavaParserに渡す設定をする
+    setSymbolResolverで名前解決についての設定
+    setLanguageLevelでjavaのバージョンを設定
+    setAttributeComments,setStoreTokens(???)
+
+    getJavaFile()
+    Stream<Path> paths=Files.walk(root)⇒root内にあるファイルを取得する
+    paths.filter(p->p.toString().endWith(".java"))           ⇒path名に対してString型にした後".java"のファイルを取得する
+                                .map(Main::parse)            ⇒取得したファイルに対してparseを行う
+                                .collect(Colectors.toList());⇒listとして返す
+    unit.accept(new MyVoidVisitor(),unit.getPackageDeclaration().get().toString())⇒unitにMyVoidVisitorでの解析を許す．(visit()が行われる)
+
+    parse()
+    JavaParser(config)⇒config設定を適応する
+    result=parser.parse(path)⇒結果と，CompilaionUnitを保存する
+    result.getResult().isPresent()⇒成功の場合True
+    result.getResult().get()⇒CompilationUnitを取得
+}
+
+MyVoidVisitor{
+    VoidVisitorAdapter<String>を継承することでvisitすることができる．
+
+    visit(ClassOrInterfaceDeclaration n,String arg)
+    ⇒accept()したCompilationUnitを走査して，ClassOrInterfaceDeclarationに該当する要素が渡されたとき実行する．
+    clazz.getEctendedType()⇒親クラス(classOrInterfaceType)を得る
+    type.resolve⇒親クラスの名前解決を行う
+}
+
+
+JavaParserについて
+構文解析を行うjavaのパッケージ
+ClassOrInterfaceDeclaration⇒宣言部分．つまり，class ~ ,Interface ~ 
+ClassOrInterfaceType⇒型参照．Class a =new Class()など
+
+javaにはプリミティブ型と参照型があり，
+プリミティブ型⇒データ型の1つで基本的な型（int,char,floatなど）
+参照型⇒javaのデータ型の1つ(String,配列,Listなど)
+プリミティブ型+参照型⇒ResolvedType
+参照型のみ⇒ResolvedReferenceTypeで親クラスの操作をしやすい．
+
+classorinterdacedeclaration.resolve()でresolvedreferencetypedeclarationになり,名前解決することができる
+これに対して，ancestors=clazz(上の処理).getAncestors()で親クラス・インターフェイスを得る.この時，親クラス・インターフェイスがなければ例外が渡される
+
