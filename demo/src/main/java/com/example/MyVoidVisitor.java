@@ -10,19 +10,25 @@ import com.github.javaparser.resolution.types.ResolvedReferenceType;
 
 
 public class MyVoidVisitor extends VoidVisitorAdapter<String> {
-
+    int num=0;
     @Override
     public void visit(ClassOrInterfaceDeclaration n,String arg) {
+
         System.out.println("arg > "+arg);
         System.out.println("class or interface > " + n.getNameAsString());
         ClassOrInterfaceDeclaration clazz = n;
 
         ResolvedReferenceTypeDeclaration resolve=clazz.resolve();                   //resolve.getAncestors()にすると継承関係がないと例外が渡される．また，クラスとインターフェイスが渡される
-        List<ResolvedReferenceType> ancestors=resolve.getAncestors().stream()       //streamにすることでfilterを使用し要素に対して処理できる
-                                                                    .filter(a->a.getTypeDeclaration().isPresent()&&a.getTypeDeclaration().get().isClass())       //gettypedeclaration()で宣言部分を返す.ispresent()で型解決できるか.isClass()でクラスであるか確認
+        List<ResolvedReferenceType> ancestors=resolve.getAllAncestors().stream()       //streamにすることでfilterを使用し要素に対して処理できる
+                                                                    .filter(a->a.getTypeDeclaration().isPresent()&&a.getTypeDeclaration().get().isClass()&&a.describe().startsWith("org"))       //gettypedeclaration()で宣言部分を返す.ispresent()で型解決できるか.isClass()でクラスであるか確認
                                                                     .toList();
         if(!ancestors.isEmpty()){
-            System.out.println("親クラス > "+ancestors.get(0).describe());
+            System.out.print("親クラス > ");
+            for(ResolvedReferenceType ancestor:ancestors){
+                System.out.print(ancestor.describe()+" ");
+                System.out.println(ancestor.getQualifiedName());
+            }
+            System.out.println();
         }else{
             System.out.println("親クラスなし");
         }
