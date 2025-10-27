@@ -54,11 +54,14 @@ public class RefusedBequest extends VoidVisitorAdapter<String> {
             }
         }
         
-        System.out.println("\nNProtM : "+ParentProtMehotds.size());
+        //System.out.println("\nNProtM : "+ParentProtMehotds);
+        System.out.print("\n");
+        ParentProtMehotds.forEach(a->System.out.print(a.getName()+" "));
+
         if(!ClassMethods.isEmpty()){
-            System.out.println("BOvR : "+((double)overrideNum/ClassMethods.size()));       
+            System.out.println("\nBOvR : "+((double)overrideNum/ClassMethods.size()));       
         }else{
-            System.out.println("BOvR : "+null);
+            System.out.println("\nBOvR : "+null);
         }
         System.out.println("\n");
         super.visit(n,arg);

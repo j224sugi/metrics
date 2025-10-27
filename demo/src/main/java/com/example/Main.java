@@ -23,7 +23,7 @@ class Main{
     public static void main(String[] args) throws IOException {
         Main main=new Main();
 
-        String strRootProject="C:\\Users\\sugii syuji\\jsoup\\src\\main\\java";
+        String strRootProject="C:\\Users\\syuuj\\jsoup\\src\\main\\java";
         Path rootProject=Paths.get(strRootProject);        
         config=Main.setSymbolSolver(rootProject);
 
@@ -32,7 +32,7 @@ class Main{
 
     public void getJavaFiles(Path root) throws  IOException{                                //rootにあるjavaファイルに対してvisitorを適応する
         int num=0;
-        NameOfClasses visitor=new NameOfClasses();
+        RefusedBequest visitor=new RefusedBequest();
         List<CompilationUnit> units=new ArrayList<>();
         try (Stream<Path> paths=Files.walk(root)){
             units=paths.filter(p->p.toString().endsWith(".java")).map(Main::parse).collect(Collectors.toList());
@@ -42,8 +42,6 @@ class Main{
                     unit.accept(visitor,unit.getPackageDeclaration().get().toString());        
                 }
             }
-            visitor.setAncestors();
-            visitor.printAncestors();
             System.out.println("クラスの個数 : "+num);
         } catch (IOException e) {
             e.printStackTrace(System.err);

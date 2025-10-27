@@ -50,6 +50,8 @@ public class NumProtMembersInParent implements IAttribute {
             protMembers=ParentProtMethods.size()+ParentProtFields.size();
         }
         node.setAttribute(getName(), protMembers);
+        node.setAttribute("ancestorsMethods",ParentMethods);
+        node.setAttribute("ancestorsFields", ParentFields);
     }
 
     public void ListProtMethods(ResolvedReferenceType ancestor) {
