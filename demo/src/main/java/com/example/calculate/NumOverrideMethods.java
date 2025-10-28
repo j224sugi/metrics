@@ -7,14 +7,15 @@ import com.example.node.ClassMetrics;
 import com.example.node.MethodMetrics;
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
+import com.github.javaparser.resolution.types.ResolvedType;
 
 public class NumOverrideMethods implements IAttribute {
 
-    List<String> nameOfClasses;
+    //List<String> nameOfClasses;
 
-    public NumOverrideMethods(List<String> nameOfClasses) {
+    /*public NumOverrideMethods(List<String> nameOfClasses) {
         this.nameOfClasses = nameOfClasses;
-    }
+    }*/
 
     @Override
     public String getName() {
@@ -24,17 +25,20 @@ public class NumOverrideMethods implements IAttribute {
     @Override
     public void calculate(ClassMetrics node) {
         int overrideNum = 0;
-        double ration=0;
+        double ration = 0;
         ResolvedReferenceTypeDeclaration resolve = node.getDeclaration().resolve();
+        @SuppressWarnings("unchecked")
         List<ResolvedMethodDeclaration> ancestorsMethods = (List<ResolvedMethodDeclaration>) node.getAttribute("ancestorsMethods");
         Set<ResolvedMethodDeclaration> ClassMethods = resolve.getDeclaredMethods();
-        if (!ClassMethods.isEmpty()&&!ancestorsMethods.isEmpty()) {
+        if (!ClassMethods.isEmpty() && !ancestorsMethods.isEmpty()) {
             for (ResolvedMethodDeclaration method : ClassMethods) {
-                if(isOverride(method,ancestorsMethods)){
-                    overrideNum+=1;
+                if (isOverride(method, ancestorsMethods)) {
+                    System.out.print(method.getName()+" ");
+                    overrideNum += 1;
                 }
             }
-            ration=(double)overrideNum/ClassMethods.size();
+            System.err.println("");
+            ration = (double) overrideNum / ClassMethods.size();
         }
         node.setAttribute(getName(), ration);
     }
@@ -53,7 +57,26 @@ public class NumOverrideMethods implements IAttribute {
         return false;
     }
 
-    public boolean isOverride(ResolvedMethodDeclaration childMethod, ResolvedMethodDeclaration ancestorMethod) {
-        return childMethod.getName().equals(ancestorMethod.getName()) && childMethod.getTypeParameters().equals(ancestorMethod.getTypeParameters());
+    public boolean isOverride(ResolvedMethodDeclaration childMethod, ResolvedMethodDeclaration parentMethod) {
+        if (!childMethod.getName().equals(parentMethod.getName())) {
+            return false;
+        }
+        if (childMethod.getNumberOfParams() != parentMethod.getNumberOfParams()) {
+            return false;
+        }
+        for (int i = 0; i < childMethod.getNumberOfParams(); i++) {
+            
+            if (!parentMethod.getParam(i).getType().isAssignableBy(childMethod.getParam(i).getType())) {
+                return false;
+            }
+        }
+        ResolvedType childMethodReturn = childMethod.getReturnType();
+        ResolvedType parentMethodReturn = parentMethod.getReturnType();
+        if (!childMethodReturn.describe().equals(parentMethodReturn.describe())) {
+            if (!parentMethodReturn.isAssignableBy(childMethodReturn)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

@@ -24,7 +24,7 @@ public class NameOfClasses extends VoidVisitorAdapter<String> {
         super();
 
         this.metricForClasses.add(new NumProtMembersInParent(nameOfClasses));
-        this.metricForClasses.add(new NumOverrideMethods(nameOfClasses));
+        this.metricForClasses.add(new NumOverrideMethods());
     }
 
     @Override
@@ -58,10 +58,12 @@ public class NameOfClasses extends VoidVisitorAdapter<String> {
     public void excuteMetrics(){
         for(ClassOrInterfaceDeclaration clazz:classesMetrics.keySet()){
             ClassMetrics classMetrics=classesMetrics.get(clazz);
+            System.out.println("クラス名 : "+clazz.getFullyQualifiedName().get());
             for(IAttribute metric : metricForClasses){
                 metric.calculate(classMetrics);
                 System.out.println(metric.getName()+" : "+classMetrics.getAttribute(metric.getName()));
             }
+            System.err.println("");
         }
     }
     
