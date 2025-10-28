@@ -4,11 +4,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import com.example.calculate.AccessToData;
 import com.example.calculate.IAttribute;
 import com.example.calculate.NumOverrideMethods;
 import com.example.calculate.NumProtMembersInParent;
 import com.example.node.ClassMetrics;
+import com.example.node.MethodMetrics;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
@@ -25,6 +28,8 @@ public class NameOfClasses extends VoidVisitorAdapter<String> {
 
         this.metricForClasses.add(new NumProtMembersInParent(nameOfClasses));
         this.metricForClasses.add(new NumOverrideMethods());
+
+        this.metricForMethods.add(new AccessToData());
     }
 
     @Override
@@ -59,11 +64,19 @@ public class NameOfClasses extends VoidVisitorAdapter<String> {
         for(ClassOrInterfaceDeclaration clazz:classesMetrics.keySet()){
             ClassMetrics classMetrics=classesMetrics.get(clazz);
             System.out.println("クラス名 : "+clazz.getFullyQualifiedName().get());
-            for(IAttribute metric : metricForClasses){
+            List<MethodDeclaration> methods=clazz.getMethods();
+            for(MethodDeclaration method:methods){
+                MethodMetrics methodMetrics=new MethodMetrics(method,classMetrics);
+                for(IAttribute metric:metricForMethods){
+                    metric.calculate(methodMetrics);
+                }
+            }
+
+            /*for(IAttribute metric : metricForClasses){
                 metric.calculate(classMetrics);
                 System.out.println(metric.getName()+" : "+classMetrics.getAttribute(metric.getName()));
-            }
-            System.err.println("");
+            }*/
+            System.out.println("");
         }
     }
     

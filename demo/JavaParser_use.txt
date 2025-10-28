@@ -46,3 +46,6 @@ classorinterdacedeclaration.resolve()でresolvedreferencetypedeclarationにな�
 これに対して，ancestors=clazz(上の処理).getAncestors()で親クラス・インターフェイスを得る.この時，親クラス・インターフェイスがなければ例外が渡される
 
 get()を行うときは値が入っていない可能性があるのでisPresent()などで確認する必要がある
+
+resolveMethodDeclaration.declaringType()で所属するクラス(ResolvedReferenceTypeDeclaration)を得る
+resolveMethodDeclaration.getClassName()で所属するクラスの名前(String)を得る

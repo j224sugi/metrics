@@ -1,28 +1,25 @@
 package com.example;
 
-import java.util.HashMap;
 import java.util.List;
 
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 
 public class BUR extends VoidVisitorAdapter<String> {
 
-    private HashMap<String, List<MethodDeclaration>> ClassMethodInv = new HashMap<>();
-
     @Override
     public void visit(ClassOrInterfaceDeclaration n, String arg) {
-        HashMap<MethodDeclaration,List<MethodCallExpr>> methodCall = new HashMap<>();
         List<MethodDeclaration> MethodDec;
         String clazz = n.getFullyQualifiedName().get();
+        System.out.println("クラス名 : "+clazz);
         MethodDec=n.getMethods();
-        ClassMethodInv.put(clazz, MethodDec);
         for(MethodDeclaration method:MethodDec){
-            methodCall.put(method,method.findAll(MethodCallExpr.class));
+            ResolvedMethodDeclaration resolveMethod=method.resolve();
+            System.out.println("メソッド名 : "+resolveMethod.getName());
+            System.out.println("getClassName() : "+resolveMethod.getClassName());
         }
-        super.visit(n, arg);
-
+        System.out.println();
     }
 }
