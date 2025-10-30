@@ -1,0 +1,26 @@
+ATFDで得た呼び出しメソッドに関して、
+呼び出しメソッドが親クラス（祖先クラス）に所属している場合、ATFDとして出力される。つまり、継承に関係せず、宣言されたクラスが返り値として返される。
+ChildClassがParentClassを継承しており、ParentClassで宣言されたfunction()を使うと、ParentClassがメソッド呼び出し元として出力される。
+オーバーライドされている場合は、ChildClassが出力される
+
+importするjarファイルをpomファイルなど通してダウンロードする必要がある。
+
+返り値がジェネリック型の場合、エラーが出る？？
+型の候補が定まっていない場合出ている。
+
+computeIfabsent().put()→computeIfAbsent()の返り値が引数によって変わるから、putの型解決ができない？？
+同じ名前の変数があれば、どちらの型を使うべきかわからなくてミスすることもある??
+
+.filter().forEach(),        filterの返り値が引数によって変わる。
+streamNodes().collect()     streamNode の返り値が<T extends Node> Stream<T>
+stream.collect()            stream=条件 ? streamNodes() : stream()       stream() の返り値はStream<Element>
+coputeIfAbsent().put()      
+filter().map().collect()
+
+return Collector.of(() -> new StringJoiner(delimiter),
+    StringJoiner::add,
+    (j1, j2) -> {
+        j1.append(j2.complete());
+        return j1;
+    },
+    StringJoiner::complete);  j1,j2が型解決できない

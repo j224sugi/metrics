@@ -86,9 +86,14 @@ public class NameOfClasses extends VoidVisitorAdapter<String> {
     }
 
     @SuppressWarnings("unchecked")
-    public void printCSV() throws IOException {
+    public void printCSV(String arg) throws IOException {
+        int allMethod=0;
+        int allMethodError=0;
+        int flag=0;
+        int allMethodExpr = 0;
+        int allMethodExprError = 0;
         try {
-            FileWriter fw = new FileWriter("sample.csv", false);
+            FileWriter fw = new FileWriter("..\\create_data\\" + arg, false);
             PrintWriter pw = new PrintWriter(new BufferedWriter(fw));
 
             pw.print("class");
@@ -104,27 +109,43 @@ public class NameOfClasses extends VoidVisitorAdapter<String> {
             for (ClassOrInterfaceDeclaration clazz : classesMetrics.keySet()) {
                 ClassMetrics classMetrics = classesMetrics.get(clazz);
                 for (MethodMetrics method : classMetrics.getMethodsMetrics()) {
+                    allMethod+=1;
+                    flag=0;
                     pw.print(clazz.getFullyQualifiedName());
                     pw.print(",");
                     pw.print(method.getDeclaration().getName());
                     pw.print(",");
-                    for(String ATFD:(List<String>) method.getAttribute("ListOfATFD")){
-                        pw.print(ATFD+" | ");
+                    for (String ATFD : (List<String>) method.getAttribute("ListOfATFD")) {
+                        pw.print(ATFD + " | ");
+                        allMethodExpr += 1;
                     }
                     pw.print(",");
-                    for(String ATLD:(List<String>) method.getAttribute("ListOfATLD")){
-                        pw.print(ATLD+" | ");
+                    for (String ATLD : (List<String>) method.getAttribute("ListOfATLD")) {
+                        pw.print(ATLD + " | ");
+                        allMethodExpr += 1;
+
                     }
                     pw.print(",");
-                    for(String Error:(List<String>) method.getAttribute("ListOfError")){
-                        pw.print(Error+" | ");
+                    for (String Error : (List<String>) method.getAttribute("ListOfError")) {
+                        if(flag==0){
+                            allMethodError+=1;
+                            flag=1;
+                        }
+                        pw.print(Error + " | ");
+                        allMethodExpr += 1;
+                        allMethodExprError += 1;
+
                     }
                     pw.println();
 
                 }
             }
             pw.close();
-        }catch(IOException e){
+            System.out.println("総メソッド数 : "+allMethod);
+            System.out.println("総エラーありメソッド数 : "+allMethodError);
+            System.out.println("総呼び出しメソッド数 : "+allMethodExpr);
+            System.out.println("総エラー数 : "+allMethodExprError);
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

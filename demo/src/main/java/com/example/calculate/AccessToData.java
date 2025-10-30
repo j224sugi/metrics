@@ -75,11 +75,14 @@ public class AccessToData extends VoidVisitorAdapter<String> implements IAttribu
 
             }
         } catch (UnsolvedSymbolException e) {
+
             ListOfError.add(node.getName() + " unsolvedSymbolException");
         } catch (UnsupportedOperationException e) {
-            ListOfError.add(node.getName() + " UnsupportedOperationException");
+            ListOfError.add(node.getName() + " unsupportedoperation");
         } catch (IllegalStateException e) {
             ListOfError.add(node.getName() + " IllegalStateException");
+        } catch (Exception e) {
+            ListOfError.add(node.getName() + e.getMessage());
         }
         super.visit(node, arg);
 

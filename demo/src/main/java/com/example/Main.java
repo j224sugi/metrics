@@ -22,29 +22,12 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeS
 
 class Main {
 
-    /*public static void main(String[] args) {
-        ReflectionTypeSolver solver = new ReflectionTypeSolver(false);
-        List<String> packages=new ArrayList<>();
-        packages.add("java.util.stream.Stream");
-        packages.add("java.util.ArrayList");
-        packages.add("org.jsoup.nodes.Element");
-        
-        for(String pack : packages){
-            try {
-                ResolvedReferenceTypeDeclaration type=solver.solveType(pack);
-                System.out.println("名前解決可能 : "+type.getQualifiedName());
-            } catch (UnsolvedSymbolException e) {
-                System.out.println("名前解決不可 : "+pack);
-            }
-        }
-    }
-}*/
     static ParserConfiguration config = new ParserConfiguration();
 
     public static void main(String[] args) throws IOException {
         Main main = new Main();
 
-        String strRootProject = "C:\\Users\\sugii syuji\\data\\HikariCP-HikariCP-4.0.3";
+        String strRootProject = "C:\\Users\\syuuj\\junit4";
         Path rootPath = Paths.get(strRootProject);
         String javaProject = strRootProject + "\\src\\main\\java";
         Path analyzePath;
@@ -56,10 +39,10 @@ class Main {
 
         }
         config = Main.setSymbolSolver(analyzePath, rootPath);
-        main.getJavaFiles(analyzePath);
+        main.getJavaFiles(analyzePath,args[0]);
     }
 
-    public void getJavaFiles(Path root) throws IOException {                                //rootにあるjavaファイルに対してvisitorを適応する
+    public void getJavaFiles(Path root,String arg) throws IOException {                                //rootにあるjavaファイルに対してvisitorを適応する
         int num = 0;
         NameOfClasses visitor = new NameOfClasses();
         List<CompilationUnit> units;
@@ -72,7 +55,7 @@ class Main {
                 }
             }
             visitor.excuteMetrics();
-            visitor.printCSV();
+            visitor.printCSV(arg);
             System.out.println("クラスの個数 : " + num);
 
         } catch (IOException e) {
@@ -101,7 +84,7 @@ class Main {
         combinedSolver.add(new ClassLoaderTypeSolver(ParserConfiguration.class.getClassLoader()));
         addJarSourceFile(combinedSolver, rootPath);
         combinedSolver.add(new JavaParserTypeSolver(analyzePath));
-        String[] packages = {"com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver", "java.io.IOException", "java.util.stream.Stream", "java.lang.StringBuilder","java.util.Map","org.jsoup.helper.Validate","org.eclipse.jdt.core.dom.ConditionalExpression","java.util.function.Function"};
+        String[] packages = {"com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver", "java.io.IOException", "java.util.stream.Stream", "java.lang.StringBuilder","java.util.Map","org.jsoup.helper.Validate","org.eclipse.jdt.core.dom.ConditionalExpression","java.util.function.Function","java.nio.charset.CharsetEncoder","com.alibaba.fastjson.annotation.JSONType"};
         for (String name : packages) {
             try {
                 System.out.println(combinedSolver.solveType(name).getQualifiedName());
