@@ -21,7 +21,7 @@ public class BaseClassUsageRatio implements IAttribute {
         int uses = 0;
 
         if (node.getMetric("NprotM") != null && node.getMetric("NprotM") > 0) {
-
+            
         }
     }
 

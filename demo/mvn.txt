@@ -1,2 +1,11 @@
 mvn cleanでmvnした情報を削除
 mvn packageでjarファイルの作成
+
+mvn dependecy:copy-depenenciesでjarファイルの作成
+
+
+charsetencoderのcanencode(char)がunsolved
+Stream<Element>のcollectがunsolved
+Mapのcomputeifabsent().put()のputがunsolved
+Stream<Element>のfilter().foreach()のforeachがunsolved
+ArrayListの.stream().filter().map().collect()のcollect()でunsupport,map()でunsolved

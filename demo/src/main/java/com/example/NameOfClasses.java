@@ -1,5 +1,9 @@
 package com.example;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,10 +24,10 @@ public class NameOfClasses extends VoidVisitorAdapter<String> {
 
     List<String> nameOfClasses = new ArrayList<>();
     List<IAttribute> metricForClasses = new ArrayList<>();
-    List<IAttribute> metricForMethods=new ArrayList<>();
+    List<IAttribute> metricForMethods = new ArrayList<>();
     HashMap<ClassOrInterfaceDeclaration, ClassMetrics> classesMetrics = new HashMap<>();
 
-    public NameOfClasses(){
+    public NameOfClasses() {
         super();
 
         this.metricForClasses.add(new NumProtMembersInParent(nameOfClasses));
@@ -45,47 +49,91 @@ public class NameOfClasses extends VoidVisitorAdapter<String> {
             ClassMetrics classMetrics = classesMetrics.get(clazz);
             classMetrics.setAttribute("nameOfClasses", nameOfClasses);
             ResolvedReferenceTypeDeclaration resolve = clazz.resolve();
-            List<ResolvedReferenceType> ancestors = resolve.getAllAncestors().stream().filter(a->a.getTypeDeclaration().isPresent()&&a.getTypeDeclaration().get().isClass()).toList();
+            List<ResolvedReferenceType> ancestors = resolve.getAllAncestors().stream().filter(a -> a.getTypeDeclaration().isPresent() && a.getTypeDeclaration().get().isClass()).toList();
 
             if (!ancestors.isEmpty()) {
-                List<String> classOfAncestors=new ArrayList<>();
+                List<String> classOfAncestors = new ArrayList<>();
                 for (ResolvedReferenceType ancestor : ancestors) {
-                    if(nameOfClasses.contains(ancestor.getQualifiedName())){
+                    if (nameOfClasses.contains(ancestor.getQualifiedName())) {
                         classOfAncestors.add(ancestor.getQualifiedName());
                     }
                 }
                 classMetrics.setAttribute("classOfAncestors", classOfAncestors);
-            }else{
-                classMetrics.setAttribute("classOfAncestors",null);
+            } else {
+                classMetrics.setAttribute("classOfAncestors", null);
             }
         }
     }
-    public void excuteMetrics(){
-        for(ClassOrInterfaceDeclaration clazz:classesMetrics.keySet()){
-            ClassMetrics classMetrics=classesMetrics.get(clazz);
-            System.out.println("クラス名 : "+clazz.getFullyQualifiedName().get());
-            List<MethodDeclaration> methods=clazz.getMethods();
-            for(MethodDeclaration method:methods){
-                MethodMetrics methodMetrics=new MethodMetrics(method,classMetrics);
-                for(IAttribute metric:metricForMethods){
+
+    public void excuteMetrics() {
+        for (ClassOrInterfaceDeclaration clazz : classesMetrics.keySet()) {
+            ClassMetrics classMetrics = classesMetrics.get(clazz);
+            //System.out.println("クラス名 : " + clazz.getFullyQualifiedName().get());
+            List<MethodDeclaration> methods = clazz.getMethods();
+            for (MethodDeclaration method : methods) {
+                MethodMetrics methodMetrics = new MethodMetrics(method, classMetrics);
+                for (IAttribute metric : metricForMethods) {
                     metric.calculate(methodMetrics);
                 }
+                classMetrics.getMethodsMetrics().add(methodMetrics);
             }
 
             /*for(IAttribute metric : metricForClasses){
                 metric.calculate(classMetrics);
                 System.out.println(metric.getName()+" : "+classMetrics.getAttribute(metric.getName()));
             }*/
-            System.out.println("");
         }
     }
-    
 
-    public void printAncestors(){
-        for(ClassOrInterfaceDeclaration clazz:classesMetrics.keySet()){
-            System.out.println("クラス名 : "+clazz.getFullyQualifiedName());
-            ClassMetrics classMetrics=classesMetrics.get(clazz);
-            System.out.println("親クラス : "+classMetrics.getAttribute("classOfAncestors")+"\n");
+    @SuppressWarnings("unchecked")
+    public void printCSV() throws IOException {
+        try {
+            FileWriter fw = new FileWriter("sample.csv", false);
+            PrintWriter pw = new PrintWriter(new BufferedWriter(fw));
+
+            pw.print("class");
+            pw.print(",");
+            pw.print("method");
+            pw.print(",");
+            pw.print("ATFD");
+            pw.print(",");
+            pw.print("ATLD");
+            pw.print(",");
+            pw.print("Error");
+            pw.println();
+            for (ClassOrInterfaceDeclaration clazz : classesMetrics.keySet()) {
+                ClassMetrics classMetrics = classesMetrics.get(clazz);
+                for (MethodMetrics method : classMetrics.getMethodsMetrics()) {
+                    pw.print(clazz.getFullyQualifiedName());
+                    pw.print(",");
+                    pw.print(method.getDeclaration().getName());
+                    pw.print(",");
+                    for(String ATFD:(List<String>) method.getAttribute("ListOfATFD")){
+                        pw.print(ATFD+" | ");
+                    }
+                    pw.print(",");
+                    for(String ATLD:(List<String>) method.getAttribute("ListOfATLD")){
+                        pw.print(ATLD+" | ");
+                    }
+                    pw.print(",");
+                    for(String Error:(List<String>) method.getAttribute("ListOfError")){
+                        pw.print(Error+" | ");
+                    }
+                    pw.println();
+
+                }
+            }
+            pw.close();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    public void printAncestors() {
+        for (ClassOrInterfaceDeclaration clazz : classesMetrics.keySet()) {
+            System.out.println("クラス名 : " + clazz.getFullyQualifiedName());
+            ClassMetrics classMetrics = classesMetrics.get(clazz);
+            System.out.println("親クラス : " + classMetrics.getAttribute("classOfAncestors") + "\n");
         }
     }
 }
